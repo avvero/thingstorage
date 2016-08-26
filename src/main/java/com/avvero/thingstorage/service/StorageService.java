@@ -10,6 +10,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -36,6 +37,8 @@ public class StorageService {
     public Integer maxSize;
 
     public UploadedFile uploadHandler(HttpServletRequest request) throws ThingStorageException {
+        MultipartFile multipartFile;
+
         UploadedFile uploadedImage = new UploadedFile();
         EntityFile entryFile = null;
         DiskFileItemFactory factory = new DiskFileItemFactory();
