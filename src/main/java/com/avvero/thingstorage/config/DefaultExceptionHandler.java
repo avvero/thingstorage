@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  * @author Avvero
  */
-//@ControllerAdvice
+@ControllerAdvice
 public class DefaultExceptionHandler {
 
     private static final Logger logger = Logger.getLogger(DefaultExceptionHandler.class);
@@ -46,6 +46,9 @@ public class DefaultExceptionHandler {
             ModelAndView mav = new ModelAndView("error");
             mav.addObject("exception", e);
             mav.addObject("message", e.getLocalizedMessage());
+
+            mav.addObject("error", e.getLocalizedMessage());
+            mav.addObject("status", status);
             mav.addObject("timestamp", new Date().getTime());
             mav.addObject("url", req.getRequestURL());
             return mav;
