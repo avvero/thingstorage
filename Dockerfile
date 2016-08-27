@@ -13,9 +13,9 @@ RUN apt-get install oracle-java8-installer -y
 
 WORKDIR /tmp
 
-RUN git clone https://avvero:avvero649@bitbucket.org/avvero/f2g.git
+RUN git clone https://github.com/avvero/thingstorage.git
 
-WORKDIR f2g
+WORKDIR thingstorage
 
 RUN chmod +x ./gradlew
 
