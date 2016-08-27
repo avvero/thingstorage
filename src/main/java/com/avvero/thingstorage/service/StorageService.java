@@ -3,6 +3,7 @@ package com.avvero.thingstorage.service;
 import com.avvero.thingstorage.dao.EntityFileRepository;
 import com.avvero.thingstorage.domain.EntityFile;
 import com.avvero.thingstorage.exception.ThingStorageException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,10 +22,9 @@ import java.util.UUID;
 /**
  * Created by avvero on 27.08.2016.
  */
+@Slf4j
 @Service
 public class StorageService {
-
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StorageService.class);
 
     @Value("${file.store.originals}")
     public String fileStoreOriginals;

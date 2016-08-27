@@ -1,7 +1,7 @@
 package com.avvero.thingstorage.config;
 
 import com.avvero.thingstorage.exception.ThingStorageException;
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,16 +15,14 @@ import java.util.Date;
 /**
  * @author Avvero
  */
+@Slf4j
 @ControllerAdvice
 public class DefaultExceptionHandler {
-
-    private static final Logger logger = Logger.getLogger(DefaultExceptionHandler.class);
 
     @ExceptionHandler(value= Exception.class)
     public Object defaultErrorHandler(HttpServletRequest req,
                                       Exception e,
                                       HttpServletResponse response) throws Throwable {
-        logger.error(e.getMessage(), e);
         return defaultHandle(HttpServletResponse.SC_BAD_REQUEST, req, e, response);
     }
 
@@ -32,11 +30,12 @@ public class DefaultExceptionHandler {
     public Object fgCommonExceptionHandler(HttpServletRequest req,
                                            ThingStorageException e,
                                            HttpServletResponse response) throws Throwable {
-        logger.error(e.getMessage(), e);
         return defaultHandle(HttpServletResponse.SC_BAD_REQUEST, req, e, response);
     }
 
     public Object defaultHandle(int status, HttpServletRequest req, Exception e, HttpServletResponse response) throws Exception {
+        log.error(e.getMessage(), e);
+
         response.setStatus(status);
         e.setStackTrace(new StackTraceElement[]{});
         Boolean isAcceptJson = req.getHeader("accept").contains("application/json");
