@@ -15,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -24,8 +26,12 @@ import java.util.UUID;
 @RestController
 public class StorageController {
 
-    @Value("${file.store}")
-    public String fileStore;
+    @Value("${file.store.originals}")
+    public String fileStoreOriginals;
+    @Value("#{'${file.types.allowed}'.split(',')}")
+    public List<String> allowedTypes;
+    @Value("${file.maxsize}")
+    public Long fileMaxSize;
     @Autowired
     EntityFileRepository entityFileRepository;
 
@@ -33,6 +39,14 @@ public class StorageController {
     public EntityFile saveRationEntry(@RequestParam("file") MultipartFile file)
             throws ThingStorageException {
         if (!file.isEmpty()) {
+            if (!allowedTypes.contains(file.getContentType())) {
+                throw new ThingStorageException(String.format("Unsupported content type: %s. Supports only: %s.",
+                        file.getContentType(), Arrays.toString(allowedTypes.toArray())));
+            }
+            if (fileMaxSize < file.getSize()) {
+                throw new ThingStorageException(String.format("The file exceeds its maximum permitted size of %s bytes. ",
+                        fileMaxSize));
+            }
             try {
                 String guid = UUID.randomUUID().toString(); //TODO проверять на уникальность
                 EntityFile entryFile = new EntityFile();
@@ -44,7 +58,7 @@ public class StorageController {
 
                 String ext = FilenameUtils.getExtension(file.getOriginalFilename());
                 String fileName = String.format("%s.%s", guid, ext);
-                Files.copy(file.getInputStream(), Paths.get(fileStore, fileName));
+                Files.copy(file.getInputStream(), Paths.get(fileStoreOriginals, fileName));
                 entityFileRepository.save(entryFile);
                 return entryFile;
             } catch (IOException e) {
