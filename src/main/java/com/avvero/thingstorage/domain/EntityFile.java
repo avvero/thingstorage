@@ -18,9 +18,11 @@ public class EntityFile {
     @GeneratedValue
     private Integer id;
     private String guid;
-    private Integer userId;
+    private String name;
     private String type;
     private Long size;
     private Date created;
+
+    private Integer userId;
 
 }
