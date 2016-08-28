@@ -1,7 +1,7 @@
 package com.avvero.thingstorage.service;
 
-import com.avvero.thingstorage.dao.EntityFileRepository;
-import com.avvero.thingstorage.domain.EntityFile;
+import com.avvero.thingstorage.dao.StoredFileRepository;
+import com.avvero.thingstorage.domain.StoredFile;
 import com.avvero.thingstorage.exception.ThingStorageException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -33,9 +33,9 @@ public class StorageService {
     @Value("${file.maxsize}")
     public Long fileMaxSize;
     @Autowired
-    EntityFileRepository entityFileRepository;
+    StoredFileRepository storedFileRepository;
 
-    public EntityFile upload(MultipartFile file) throws ThingStorageException {
+    public StoredFile upload(MultipartFile file) throws ThingStorageException {
         if (!file.isEmpty()) {
             if (!allowedTypes.contains(file.getContentType())) {
                 throw new ThingStorageException(String.format("Unsupported content type: %s. Supports only: %s.",
@@ -50,7 +50,7 @@ public class StorageService {
                 String ext = FilenameUtils.getExtension(file.getOriginalFilename());
                 String fileName = String.format("%s.%s", guid, ext);
 
-                EntityFile entryFile = new EntityFile();
+                StoredFile entryFile = new StoredFile();
                 entryFile.setUserId(null); //TODO
                 entryFile.setGuid(guid);
                 entryFile.setName(fileName);
@@ -59,7 +59,7 @@ public class StorageService {
                 entryFile.setCreated(new Date());
 
                 Files.copy(file.getInputStream(), Paths.get(fileStoreOriginals, fileName));
-                entityFileRepository.save(entryFile);
+                storedFileRepository.save(entryFile);
                 return entryFile;
             } catch (IOException e) {
                 log.error(e.getLocalizedMessage(), e);
@@ -73,9 +73,9 @@ public class StorageService {
     }
 
     public void remove(String guid) {
-        EntityFile entityFile = entityFileRepository.findOneByGuid(guid);
-        if (entityFile != null) {
-            Path path = Paths.get(fileStoreOriginals, entityFile.getName());
+        StoredFile storedFile = storedFileRepository.findOneByGuid(guid);
+        if (storedFile != null) {
+            Path path = Paths.get(fileStoreOriginals, storedFile.getName());
             try {
                 Files.delete(path);
             } catch (IOException e) {
@@ -83,7 +83,7 @@ public class StorageService {
                 throw new ThingStorageException("Failed to remove " + path + " => "
                         + e.getMessage());
             }
-            entityFileRepository.delete(entityFile);
+            storedFileRepository.delete(storedFile);
         } else {
             log.warn(String.format("File %s does not exists. Skip removing.", guid));
         }
@@ -93,7 +93,7 @@ public class StorageService {
         String guid;
         do {
             guid = UUID.randomUUID().toString();
-        } while (entityFileRepository.findOneByGuid(guid) != null);
+        } while (storedFileRepository.findOneByGuid(guid) != null);
         return guid;
     }
 }

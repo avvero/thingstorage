@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @Data
 @Entity
-public class EntityFile {
+public class StoredFile {
 
     @Id
     @GeneratedValue

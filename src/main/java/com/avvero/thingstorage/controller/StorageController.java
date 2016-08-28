@@ -1,6 +1,6 @@
 package com.avvero.thingstorage.controller;
 
-import com.avvero.thingstorage.domain.EntityFile;
+import com.avvero.thingstorage.domain.StoredFile;
 import com.avvero.thingstorage.exception.ThingStorageException;
 import com.avvero.thingstorage.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class StorageController {
     StorageService storageService;
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public EntityFile upload(@RequestParam("file") MultipartFile file) throws ThingStorageException {
+    public StoredFile upload(@RequestParam("file") MultipartFile file) throws ThingStorageException {
         return storageService.upload(file);
     }
 
