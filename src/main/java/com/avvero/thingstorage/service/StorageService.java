@@ -5,19 +5,24 @@ import com.avvero.thingstorage.domain.StoredFile;
 import com.avvero.thingstorage.exception.ThingStorageException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by avvero on 27.08.2016.
@@ -28,6 +33,8 @@ public class StorageService {
 
     @Value("${file.store.originals}")
     public String fileStoreOriginals;
+    @Value("${file.store.compressed}")
+    public String fileStoreCompressed;
     @Value("#{'${file.types.allowed}'.split(',')}")
     public List<String> allowedTypes;
     @Value("${file.maxsize}")
@@ -60,6 +67,8 @@ public class StorageService {
 
                 Files.copy(file.getInputStream(), Paths.get(fileStoreOriginals, fileName));
                 storedFileRepository.save(entryFile);
+                // Make compressed copy
+                compress(fileStoreOriginals, fileStoreCompressed, fileName);
                 return entryFile;
             } catch (IOException e) {
                 log.error(e.getLocalizedMessage(), e);
@@ -89,11 +98,63 @@ public class StorageService {
         }
     }
 
+    public Pair<StoredFile, File> getOriginal(String name) {
+        StoredFile storedFile = storedFileRepository.findOneByGuid(name);
+        if (storedFile != null) {
+            File file = new File(Paths.get(fileStoreOriginals, storedFile.getName()).toUri());
+            return new ImmutablePair<>(storedFile, file);
+        } else {
+            throw new ThingStorageException(String.format("File %s does not exists.", name));
+        }
+    }
+
+    public Pair<StoredFile, File> getCompressed(String name) {
+        StoredFile storedFile = storedFileRepository.findOneByGuid(name);
+        if (storedFile != null) {
+            File file = new File(Paths.get(fileStoreCompressed, storedFile.getName()).toUri());
+            return new ImmutablePair<>(storedFile, file);
+        } else {
+            throw new ThingStorageException(String.format("File %s does not exists.", name));
+        }
+    }
+
     public String getGuid() {
         String guid;
         do {
             guid = UUID.randomUUID().toString();
         } while (storedFileRepository.findOneByGuid(guid) != null);
         return guid;
+    }
+
+    /**
+     * File compression with quality = 0.7f
+     * @param fileStoreOriginals
+     * @param fileStoreCompressed
+     * @param fileName
+     * @throws ThingStorageException
+     */
+    public static void compress(String fileStoreOriginals, String fileStoreCompressed, String fileName)
+            throws ThingStorageException {
+        File imageFile = new File(Paths.get(fileStoreOriginals, fileName).toUri());
+        File compressedImageFile = new File(Paths.get(fileStoreCompressed, fileName).toUri());
+
+        try (InputStream is = new FileInputStream(imageFile);
+             ImageOutputStream ios = ImageIO.createImageOutputStream(new FileOutputStream(compressedImageFile))) {
+            float quality = 0.7f;
+            BufferedImage image = ImageIO.read(is);
+            Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+            if (!writers.hasNext())
+                throw new IllegalStateException("No writers found");
+
+            ImageWriter writer = writers.next();
+            writer.setOutput(ios);
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            param.setCompressionQuality(quality);
+            writer.write(null, new IIOImage(image, null, null), param);
+            writer.dispose();
+        } catch (IOException e) {
+            throw new ThingStorageException(e);
+        }
     }
 }
