@@ -53,6 +53,8 @@ public class StorageService {
                         fileMaxSize));
             }
             try {
+                long startTime = System.currentTimeMillis();
+
                 String guid = getGuid();
                 String ext = FilenameUtils.getExtension(file.getOriginalFilename());
                 String fileName = String.format("%s.%s", guid, ext);
@@ -67,6 +69,8 @@ public class StorageService {
 
                 Files.copy(file.getInputStream(), Paths.get(fileStoreOriginals, fileName));
                 storedFileRepository.save(entryFile);
+                log.info(String.format("File storing %s is complete in %s ms", fileName,
+                        System.currentTimeMillis() - startTime));
                 // Make compressed copy
                 compress(fileStoreOriginals, fileStoreCompressed, fileName);
                 return entryFile;
@@ -135,6 +139,7 @@ public class StorageService {
      */
     public static void compress(String fileStoreOriginals, String fileStoreCompressed, String fileName)
             throws ThingStorageException {
+        long startTime = System.currentTimeMillis();
         File imageFile = new File(Paths.get(fileStoreOriginals, fileName).toUri());
         File compressedImageFile = new File(Paths.get(fileStoreCompressed, fileName).toUri());
 
@@ -156,5 +161,7 @@ public class StorageService {
         } catch (IOException e) {
             throw new ThingStorageException(e);
         }
+        log.info(String.format("File compression %s is complete in %s ms", fileName,
+                System.currentTimeMillis() - startTime));
     }
 }
