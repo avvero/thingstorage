@@ -3,6 +3,8 @@ package com.avvero.thingstorage.service;
 import com.avvero.thingstorage.dao.StoredFileRepository;
 import com.avvero.thingstorage.domain.StoredFile;
 import com.avvero.thingstorage.exception.ThingStorageException;
+import com.avvero.thingstorage.utils.CommonUtils;
+import com.avvero.thingstorage.utils.ImageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -35,13 +37,23 @@ public class StorageService {
     public String fileStoreOriginals;
     @Value("${file.store.compressed}")
     public String fileStoreCompressed;
+    @Value("${file.store.cached}")
+    public String fileStoreCached;
     @Value("#{'${file.types.allowed}'.split(',')}")
     public List<String> allowedTypes;
+    @Value("#{'${file.cached.variant}'.split(',')}")
+    public List<String> cachedVariant;
     @Value("${file.maxsize}")
     public Long fileMaxSize;
     @Autowired
     StoredFileRepository storedFileRepository;
 
+    /**
+     * Upload
+     * @param file
+     * @return
+     * @throws ThingStorageException
+     */
     public StoredFile upload(MultipartFile file) throws ThingStorageException {
         if (!file.isEmpty()) {
             if (!allowedTypes.contains(file.getContentType())) {
@@ -69,10 +81,12 @@ public class StorageService {
 
                 Files.copy(file.getInputStream(), Paths.get(fileStoreOriginals, fileName));
                 storedFileRepository.save(entryFile);
-                log.info(String.format("File storing %s is complete in %s ms", fileName,
+                log.info(String.format("Storing of the file %s is complete in %s ms", fileName,
                         System.currentTimeMillis() - startTime));
                 // Make compressed copy
                 compress(fileStoreOriginals, fileStoreCompressed, fileName);
+                // Make cached variants
+                cache(entryFile, cachedVariant);
                 return entryFile;
             } catch (IOException e) {
                 log.error(e.getLocalizedMessage(), e);
@@ -85,6 +99,10 @@ public class StorageService {
         }
     }
 
+    /**
+     * Remove
+     * @param guid
+     */
     public void remove(String guid) {
         StoredFile storedFile = storedFileRepository.findOneByGuid(guid);
         if (storedFile != null) {
@@ -102,6 +120,11 @@ public class StorageService {
         }
     }
 
+    /**
+     * Original file
+     * @param name
+     * @return
+     */
     public Pair<StoredFile, File> getOriginal(String name) {
         StoredFile storedFile = storedFileRepository.findOneByGuid(name);
         if (storedFile != null) {
@@ -112,6 +135,11 @@ public class StorageService {
         }
     }
 
+    /**
+     * Compressed file
+     * @param name
+     * @return
+     */
     public Pair<StoredFile, File> getCompressed(String name) {
         StoredFile storedFile = storedFileRepository.findOneByGuid(name);
         if (storedFile != null) {
@@ -120,6 +148,46 @@ public class StorageService {
         } else {
             throw new ThingStorageException(String.format("File %s does not exists.", name));
         }
+    }
+
+    /**
+     * Get cached
+     * @param name
+     * @param w
+     * @param h
+     * @return
+     */
+    public Pair<StoredFile, File> getCached(String name, int w, int h) {
+        StoredFile storedFile = storedFileRepository.findOneByGuid(name);
+        if (storedFile != null) {
+            String cachedDir = String.format("%s/%sx%s", fileStoreCached, w, h);
+            File file = new File(Paths.get(cachedDir, storedFile.getName()).toUri());
+            if (!file.exists()) {
+                cache(storedFile, w, h);
+                file = new File(Paths.get(cachedDir, storedFile.getName()).toUri());
+            }
+            return new ImmutablePair<>(storedFile, file);
+        } else {
+            throw new ThingStorageException(String.format("File %s does not exists.", name));
+        }
+    }
+
+    private void cache(StoredFile entryFile, List<String> cachedVariant) {
+        for (String variant : cachedVariant) {
+            Pair<Integer, Integer> dimensions = CommonUtils.getDimensions(variant);
+            cache(entryFile, dimensions.getLeft(), dimensions.getRight());
+        }
+    }
+
+    private void cache(StoredFile storedFile, int w, int h) {
+        long startTime = System.currentTimeMillis();
+
+        String cachedDir = String.format("%s/%sx%s", fileStoreCached, w, h);
+        String ext = FilenameUtils.getExtension(storedFile.getName());
+        ImageUtils.resizeThroughScalr(fileStoreOriginals, cachedDir, storedFile.getGuid(), ext, w, h);
+
+        log.info(String.format("Resizing of the file %s is complete in %s ms", storedFile.getName(),
+                System.currentTimeMillis() - startTime));
     }
 
     public String getGuid() {
@@ -144,7 +212,9 @@ public class StorageService {
         File compressedImageFile = new File(Paths.get(fileStoreCompressed, fileName).toUri());
 
         try (InputStream is = new FileInputStream(imageFile);
-             ImageOutputStream ios = ImageIO.createImageOutputStream(new FileOutputStream(compressedImageFile))) {
+             OutputStream os = new FileOutputStream(compressedImageFile)) {
+            ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+
             float quality = 0.7f;
             BufferedImage image = ImageIO.read(is);
             Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
@@ -161,7 +231,7 @@ public class StorageService {
         } catch (IOException e) {
             throw new ThingStorageException(e);
         }
-        log.info(String.format("File compression %s is complete in %s ms", fileName,
+        log.info(String.format("Compression of the file %s is complete in %s ms", fileName,
                 System.currentTimeMillis() - startTime));
     }
 }

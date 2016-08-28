@@ -3,6 +3,7 @@ package com.avvero.thingstorage.controller;
 import com.avvero.thingstorage.domain.StoredFile;
 import com.avvero.thingstorage.exception.ThingStorageException;
 import com.avvero.thingstorage.service.StorageService;
+import com.avvero.thingstorage.utils.CommonUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,14 @@ public class StorageController {
     @RequestMapping(value = "/compressed/{name}", method = RequestMethod.GET)
     public void compressed(@PathVariable String name, HttpServletResponse response) throws ThingStorageException {
         Pair<StoredFile, File> pair = storageService.getCompressed(name);
+        writeFileToResponse(pair.getKey(), pair.getValue(), response);
+    }
+
+    @RequestMapping(value = "/cached/{wxh}/{name}", method = RequestMethod.GET)
+    public void compressed(@PathVariable String wxh, @PathVariable String name, HttpServletResponse response)
+            throws ThingStorageException {
+        Pair<Integer, Integer> dimensions = CommonUtils.getDimensions(wxh);
+        Pair<StoredFile, File> pair = storageService.getCached(name, dimensions.getLeft(), dimensions.getRight());
         writeFileToResponse(pair.getKey(), pair.getValue(), response);
     }
 
