@@ -53,7 +53,9 @@ dependencies {
 
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
     compile group: 'commons-fileupload', name: 'commons-fileupload', version: '1.2.2'
+
     compile 'com.h2database:h2:1.4.192'
+    runtime 'mysql:mysql-connector-java:5.1.6'
 
     runtime files('lib/flow-support-1.0.0.jar')
 }
