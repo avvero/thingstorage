@@ -41,10 +41,12 @@ public class StorageService {
     public String fileStoreCached;
     @Value("#{'${file.types.allowed}'.split(',')}")
     public List<String> allowedTypes;
-    @Value("#{'${file.cached.variant}'.split(',')}")
+    @Value("#{'${file.cache.variants}'.split(',')}")
     public List<String> cachedVariant;
     @Value("${file.maxsize}")
     public Long fileMaxSize;
+    @Value("${file.cache.method}")
+    public String cacheMethod;
     @Autowired
     StoredFileRepository storedFileRepository;
 
@@ -184,7 +186,7 @@ public class StorageService {
 
         String cachedDir = String.format("%s/%sx%s", fileStoreCached, w, h);
         String ext = FilenameUtils.getExtension(storedFile.getName());
-        ImageUtils.resizeThroughScalr(fileStoreOriginals, cachedDir, storedFile.getGuid(), ext, w, h);
+        ImageUtils.resizeThroughScalr(fileStoreOriginals, cachedDir, storedFile.getGuid(), ext, w, h, cacheMethod);
 
         log.info(String.format("Resizing of the file %s is complete in %s ms", storedFile.getName(),
                 System.currentTimeMillis() - startTime));

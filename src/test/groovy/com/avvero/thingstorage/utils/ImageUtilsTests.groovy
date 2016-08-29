@@ -13,7 +13,7 @@ class ImageUtilsTests extends Specification {
             def c = "D:/temp/store/cached"
 
         when:
-            ImageUtils.resizeThroughScalr(o, c, file, ext, w, h)
+            ImageUtils.resizeThroughScalr(o, c, file, ext, w, h, "BALANCED")
         then:
             1 == 1
         where:

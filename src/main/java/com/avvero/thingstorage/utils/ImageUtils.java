@@ -24,13 +24,13 @@ import java.io.IOException;
      * for details, including the comments.
      */
     public static void resizeThroughScalr(String sourceDir, String destinationDir, String fileName, String ext,
-                                    int width, int height) {
+                                    int width, int height, String cacheMethod) {
         try {
             Image image = ImageIO.read(new File(sourceDir, String.format("%s.%s", fileName, ext)));
             loadCompletely(image);
             BufferedImage bm = toBufferedImage(image);
             // Через простой алгоритм
-            bm = Scalr.resize(bm, Scalr.Method.BALANCED, width, height);
+            bm = Scalr.resize(bm, Scalr.Method.valueOf(cacheMethod), width, height);
             File outFile = new File(destinationDir, String.format("%s.%s", fileName, ext));
             outFile.getParentFile().mkdirs(); //создадим все директории
             ImageIO.write(bm, ext, outFile);
