@@ -1,5 +1,6 @@
 package com.avvero.thingstorage.utils
 
+import spock.lang.Ignore
 import spock.lang.Specification
 
 /**
@@ -7,6 +8,7 @@ import spock.lang.Specification
  */
 class ImageUtilsTests extends Specification {
 
+    @Ignore
     def "test"() {
         setup:
             def o = "C:/Users/Public/Pictures/Sample Pictures"
