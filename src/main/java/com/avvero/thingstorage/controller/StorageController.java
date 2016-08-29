@@ -37,7 +37,7 @@ public class StorageController {
         storageService.remove(name);
     }
 
-    @RequestMapping(value = "/originals/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "/original/{name}", method = RequestMethod.GET)
     public void originals(@PathVariable String name, HttpServletResponse response) throws ThingStorageException {
         Pair<StoredFile, File> pair = storageService.getOriginal(name);
         writeFileToResponse(pair.getKey(), pair.getValue(), response);
@@ -49,7 +49,7 @@ public class StorageController {
         writeFileToResponse(pair.getKey(), pair.getValue(), response);
     }
 
-    @RequestMapping(value = "/cached/{wxh}/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "/cache/{wxh}/{name}", method = RequestMethod.GET)
     public void compressed(@PathVariable String wxh, @PathVariable String name, HttpServletResponse response)
             throws ThingStorageException {
         Pair<Integer, Integer> dimensions = CommonUtils.getDimensions(wxh);
