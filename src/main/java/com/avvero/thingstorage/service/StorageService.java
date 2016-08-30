@@ -41,8 +41,6 @@ public class StorageService {
     public String fileStoreCached;
     @Value("#{'${file.types.allowed}'.split(',')}")
     public List<String> allowedTypes;
-    @Value("#{'${file.cache.variants}'.split(',')}")
-    public List<String> cachedVariant;
     @Value("${file.maxsize}")
     public Long fileMaxSize;
     @Value("${file.cache.method}")
@@ -169,13 +167,6 @@ public class StorageService {
             return new ImmutablePair<>(storedFile, file);
         } else {
             throw new ThingStorageException(String.format("File %s does not exists.", name));
-        }
-    }
-
-    private void cache(StoredFile entryFile, List<String> cachedVariant) {
-        for (String variant : cachedVariant) {
-            Pair<Integer, Integer> dimensions = CommonUtils.getDimensions(variant);
-            cache(entryFile, dimensions.getLeft(), dimensions.getRight());
         }
     }
 
