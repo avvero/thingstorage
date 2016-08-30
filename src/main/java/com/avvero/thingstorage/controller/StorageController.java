@@ -6,6 +6,7 @@ import com.avvero.thingstorage.service.StorageService;
 import com.avvero.thingstorage.utils.CommonUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +16,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 
 /**
  * Created by avvero on 26.08.2016.
@@ -22,7 +24,10 @@ import java.io.IOException;
 @RestController
 public class StorageController {
 
-    private static final int BUFSIZE = 4096;
+    private static final int BUFFER_LENGTH = 1024 * 16;
+
+    @Value("${file.expire_duration_millis}")
+    public Long fileExpireDurationMillis;
 
     @Autowired
     StorageService storageService;
@@ -64,17 +69,22 @@ public class StorageController {
      * @param response
      * @throws ThingStorageException
      */
-    public static void writeFileToResponse(StoredFile storedFile, File file, HttpServletResponse response)
+    public void writeFileToResponse(StoredFile storedFile, File file, HttpServletResponse response)
             throws ThingStorageException {
         int length;
         try (DataInputStream in = new DataInputStream(new FileInputStream(file));
              ServletOutputStream outStream = response.getOutputStream()) {
+
+            // sets HTTP header
+            response.setHeader("Accept-Ranges", "bytes");
+            response.setHeader("Content-Disposition", String.format("inline;filename=\"%s\"", storedFile.getName()));
+            response.setDateHeader("Last-Modified", storedFile.getCreated().getTime());
+            response.setDateHeader("Expires", System.currentTimeMillis() + fileExpireDurationMillis);
             response.setContentType(storedFile.getType());
             response.setContentLength((int) file.length());
-            // sets HTTP header
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
-            byte[] byteBuffer = new byte[BUFSIZE];
-            ;
+
+            byte[] byteBuffer = new byte[4096];
+
             // reads the file's bytes and writes them to the response stream
             while ((in != null) && ((length = in.read(byteBuffer)) != -1)) {
                 outStream.write(byteBuffer, 0, length);
