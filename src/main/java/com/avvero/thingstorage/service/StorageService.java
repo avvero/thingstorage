@@ -87,8 +87,6 @@ public class StorageService {
                         System.currentTimeMillis() - startTime));
                 // Make compressed copy
                 compress(fileStoreOriginals, fileStoreCompressed, fileName);
-                // Make cached variants
-                cache(entryFile, cachedVariant);
                 return entryFile;
             } catch (IOException e) {
                 log.error(e.getLocalizedMessage(), e);
