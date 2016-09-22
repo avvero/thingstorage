@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app" ng-controller="mainController">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <meta name="google-site-verification" content="TODO"/>
+    <meta name="yandex-verification" content="TODO"/>
+
+    <meta name="url" content="thingstorage.ru">
+    <meta name="title" content="Thingstorage">
+    <meta name="description" content="Хостинг изображений">
+    <meta name="image" content="/img/logo-200.png">
+
+    <meta property="og:url" content="thingstorage.ru"/>
+    <meta property="og:title" content="Thingstorage"/>
+    <meta property="og:description" content="Хостинг изображений"/>
+    <meta property="og:image" content="/img/logo-200.png"/>
+
+    <link rel="image_src" href="/img/logo-200.png"/>
+    <meta name="keywords" content="thingstorage">
+
+    <link rel="shortcut icon" type="image/png" href="favicon.ico"/>
+    <title>Thingstorage</title>
+
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.5 -->
+    <link rel="stylesheet" href="/css/vendor/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/css/vendor/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="/css/vendor/ionicons.min.css">
+
+    <link rel="stylesheet" href="/css/vendor/jquery.gritter.css">
+
+    <link rel="stylesheet" href="/css/vendor/textAngular.css">
+    <link rel="stylesheet" href="/css/vendor/ngGallery.css">
+    <link rel="stylesheet" href="/css/vendor/loading-bar.min.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="/js/vendor/html5shiv.min.js"></script>
+    <script src="/js/vendor/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery 2.1.4 -->
+    <script src="/js/vendor/jQuery-2.1.4.min.js"></script>
+    <script src="/js/vendor/jquery.gritter.min.js"></script>
+    <!-- Bootstrap 3.3.5 -->
+    <script src="/js/vendor/bootstrap.min.js"></script>
+
+    <script src="/js/vendor/angular.min.js"></script>
+    <script src="/js/vendor/angular-locale_ru-ru.js"></script>
+    <!--<script src="/js/vendor/angular-sanitize.js"></script>-->
+    <script src="/js/vendor/angular-route.js"></script>
+    <script src="/js/vendor/angular-ui-router.js"></script>
+    <script src="/js/vendor/angular-animate.js"></script>
+    <script src="/js/vendor/angular-touch.min.js"></script>
+    <!--<script src="/js/vendor/ui-bootstrap-1.1.2.js"></script>-->
+    <script src="/js/vendor/ui-bootstrap-tpls-1.2.5.min.js"></script>
+    <script src="/js/vendor/textAngular-rangy.min.js"></script>
+    <script src="/js/vendor/textAngular-sanitize.js"></script>
+    <script src="/js/vendor/textAngular.min.js"></script>
+    <script src="/js/vendor/ngGallery.js"></script>
+    <script src="/js/vendor/loading-bar.min.js"></script>
+    <script src="/js/vendor/ng-infinite-scroll.min.js"></script>
+    <script src="/js/vendor/ng-file-upload-all.min.js"></script>
+    <script src="/js/vendor/ng-file-upload-shim.min.js"></script>
+
+    <script src="/js/app.js"></script>
+
+    <script src="/js/controllers/welcome.js"></script>
+</head>
+<body>
+    <div ui-view="single" autoscroll="false"></div>
+</body>
+</html>

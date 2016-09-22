@@ -24,8 +24,6 @@ import java.nio.file.Files;
 @RestController
 public class StorageController {
 
-    private static final int BUFFER_LENGTH = 1024 * 16;
-
     @Value("${file.expire_duration_millis}")
     public Long fileExpireDurationMillis;
 
