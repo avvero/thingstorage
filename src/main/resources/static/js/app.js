@@ -27,7 +27,7 @@ angular.module("app").config(['$routeProvider', '$stateProvider', '$urlRouterPro
                 url: "/",
                 views: {
                     "single": {
-                        templateUrl: '/view/file/list.html',
+                        templateUrl: 'view/file/list.html',
                         controller: 'fileListController',
                         resolve: {
                             model: ['$q', '$http', '$stateParams', 'Notification',
@@ -36,7 +36,7 @@ angular.module("app").config(['$routeProvider', '$stateProvider', '$urlRouterPro
                                     var urlCalls = [];
                                     urlCalls.push($http({
                                         method: 'GET',
-                                        url: '/list',
+                                        url: 'list',
                                         headers: {'Content-Type': 'application/json;charset=UTF-8'}
                                     }))
                                     $q.all(urlCalls)

@@ -2,7 +2,7 @@
     Список
 </div>
 <div>
-    <span ng-repeat="file in fileList">
-        <img ng-src="/cache/100x100/{{file.name}}">
+    <span ng-repeat="file in fileList" class="file_list">
+        <img ng-src="{{file.isSelected ? '/compressed' : '/cache/100x100'}}/{{file.name}}" ng-click="selectInList(file)">
     </span>
 </div>
