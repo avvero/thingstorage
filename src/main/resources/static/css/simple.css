@@ -1,3 +1,18 @@
-.file_list img {
+.file_list_entry {
+    width: 100px;
+    height: 100px;
+}
+
+.file_list_entry.selected {
+    width: 400px;
+    height: 400px;
+}
+
+.file_list_entry img {
+    cursor: pointer;
+}
+
+.file_list_entry.selected img {
     max-height: 400px;
+    max-width: 400px;
 }
