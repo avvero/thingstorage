@@ -27,8 +27,34 @@ angular.module("app").config(['$routeProvider', '$stateProvider', '$urlRouterPro
                 url: "/",
                 views: {
                     "single": {
-                        templateUrl: '/view/welcome.html',
-                        controller: 'welcomeController'
+                        templateUrl: '/view/file/list.html',
+                        controller: 'fileListController',
+                        resolve: {
+                            model: ['$q', '$http', '$stateParams', 'Notification',
+                                function ($q, $http, $stateParams, Notification) {
+                                    var deferred = $q.defer();
+                                    var urlCalls = [];
+                                    urlCalls.push($http({
+                                        method: 'GET',
+                                        url: '/list',
+                                        headers: {'Content-Type': 'application/json;charset=UTF-8'}
+                                    }))
+                                    $q.all(urlCalls)
+                                        .then(
+                                        function (results) {
+                                            var data = []
+                                            data.fileList = results[0].data
+                                            deferred.resolve(data)
+                                        },
+                                        function (errors) {
+                                            Notification.error(errors.data)
+                                        },
+                                        function (updates) {
+                                            deferred.update(updates);
+                                        });
+                                    return deferred.promise;
+                                }]
+                        }
                     }
                 }
             })

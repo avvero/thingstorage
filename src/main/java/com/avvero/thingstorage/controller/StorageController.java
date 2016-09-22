@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 
 /**
  * Created by avvero on 26.08.2016.
@@ -58,6 +59,11 @@ public class StorageController {
         Pair<Integer, Integer> dimensions = CommonUtils.getDimensions(wxh);
         Pair<StoredFile, File> pair = storageService.getCached(name, dimensions.getLeft(), dimensions.getRight());
         writeFileToResponse(pair.getKey(), pair.getValue(), response);
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public List<StoredFile> list() throws ThingStorageException {
+        return storageService.list();
     }
 
     /**

@@ -73,6 +73,8 @@
     <script src="/js/app.js"></script>
 
     <script src="/js/controllers/welcome.js"></script>
+    <script src="/js/controllers/file/fileListController.js"></script>
+    <script src="/js/services/notification.js"></script>
 </head>
 <body>
     <div ui-view="single" autoscroll="false"></div>

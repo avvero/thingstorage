@@ -88,8 +88,7 @@ public class StorageService {
                 return entryFile;
             } catch (IOException e) {
                 log.error(e.getLocalizedMessage(), e);
-                throw new ThingStorageException("Failed to upload " + file.getOriginalFilename() + " => "
-                        + e.getMessage());
+                throw new ThingStorageException("Failed to upload " + file.getOriginalFilename());
             }
         } else {
             throw new ThingStorageException("Failed to upload " + file.getOriginalFilename()
@@ -224,5 +223,9 @@ public class StorageService {
         }
         log.info(String.format("Compression of the file %s is complete in %s ms", fileName,
                 System.currentTimeMillis() - startTime));
+    }
+
+    public List<StoredFile> list() {
+        return storedFileRepository.findAllByOrderByIdDesc();
     }
 }
