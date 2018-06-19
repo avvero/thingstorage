@@ -21,12 +21,6 @@ import static ch.qos.logback.classic.Level.INFO
 import static ch.qos.logback.classic.Level.TRACE
 import static ch.qos.logback.classic.Level.WARN
 
-appender("flow", MarkerSocketAppender) {
-    remoteHost = "FLOW-22088A04"
-    port = 4561
-    marker = "thingstorage"
-}
-
 appender("file", RollingFileAppender) {
     file = "/var/log/service/thingstorage/service.log"
     encoder(PatternLayoutEncoder) {
@@ -38,11 +32,11 @@ appender("file", RollingFileAppender) {
     }
 }
 
-logger("org", ERROR, ["flow", "file"])
-logger("org.springframework", ERROR, ["flow", "file"])
-logger("org.springframework.web", INFO, ["flow", "file"])
-logger("org.springframework.web.filter", DEBUG, ["flow", "file"])
-logger("org.hibernate", INFO, ["flow", "file"])
-logger("org.hibernate.SQL", DEBUG, ["flow", "file"])
-logger("com.avvero", TRACE, ["flow", "file"])
-root(ERROR, ["flow", "file"])
+logger("org", ERROR, ["file"])
+logger("org.springframework", ERROR, ["file"])
+logger("org.springframework.web", INFO, ["file"])
+logger("org.springframework.web.filter", DEBUG, ["file"])
+logger("org.hibernate", INFO, ["file"])
+logger("org.hibernate.SQL", DEBUG, ["file"])
+logger("com.avvero", TRACE, ["file"])
+root(ERROR, ["file"])
